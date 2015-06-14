@@ -398,7 +398,7 @@ int main(int argc, char **argv)
 	char filename[4096];
 	char workload[4096] = {0,};
 	int  iterations = 1, auto_tune = 0;
-	int  calibrate = 0;
+	int  calibration = 0;
 
 	set_new_handler(out_of_memory);
 
@@ -424,7 +424,7 @@ int main(int argc, char **argv)
 			ui_notify_user = ui_notify_user_console;
 			break;
 		case 'c':
-			calibrate = 1;
+			calibration = 1;
 			break;
 		case 'C':		/* csv report */
 			reporttype = REPORT_CSV;
@@ -471,7 +471,7 @@ int main(int argc, char **argv)
 
 	powertop_init();
 	
-	if (calibrate)
+	if (calibration)
 		calibrate();
 
 	if (reporttype != REPORT_OFF)
