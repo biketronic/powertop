@@ -2,9 +2,15 @@
 ------------------------------
 
 To build and install PowerTOP type the following commands, 
-	./configure 
-	./make
-	./make install
+	autoconf --install
+	mkdir build
+	cd build
+	../configure
+	make
+	
+	or simply run
+	
+	./autogen.sh
 
 Note: For Android (running Intel Architecture ) there is a Android.mk 
 that was provided by community members, and at this time is supported
