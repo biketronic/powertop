@@ -68,6 +68,7 @@
 
 int debug_learning = 0;
 unsigned time_out = 20;
+unsigned dead_time = 0;
 int leave_powertop = 0;
 void (*ui_notify_user) (const char *frmt, ...);
 
@@ -84,6 +85,7 @@ static const struct option long_options[] =
 	{"calibrate",	no_argument,		NULL,		 'c'},
 	{"csv",		optional_argument,	NULL,		 'C'},
 	{"debug",	no_argument,		&debug_learning, OPT_DEBUG},
+	{"deadtime"	optional_argument,	NULL,		 'd'},
 	{"extech",	optional_argument,	NULL,		 OPT_EXTECH},
 	{"html",	optional_argument,	NULL,		 'r'},
 	{"iteration",	optional_argument,	NULL,		 'i'},
@@ -121,6 +123,7 @@ static void print_usage()
 	printf(" -c, --calibrate\t %s\n", _("runs powertop in calibration mode"));
 	printf(" -C, --csv%s\t %s\n", _("[=filename]"), _("generate a csv report"));
 	printf("     --debug\t\t %s\n", _("run in \"debug\" mode"));
+	printf(" -d  --deadtime\t\t %s\n", _("delay before taking a power measurement"));
 	printf("     --extech%s\t %s\n", _("[=devnode]"), _("uses an Extech Power Analyzer for measurements"));
 	printf(" -r, --html%s\t %s\n", _("[=filename]"), _("generate a html report"));
 	printf(" -i, --iteration%s\n", _("[=iterations] number of times to run each test"));
@@ -199,6 +202,10 @@ static void do_sleep(int seconds)
 
 void one_measurement(int seconds, char *workload)
 {
+	if (!(workload && workload[0])) {
+		do_sleep(dead_time);
+	}
+	
 	create_all_usb_devices();
 	start_power_measurement();
 	devices_start_measurement();
@@ -210,7 +217,7 @@ void one_measurement(int seconds, char *workload)
 		if (system(workload))
 			fprintf(stderr, _("Unknown issue running workload!\n"));
 	} else {
-		do_sleep(seconds);
+		do_sleep(seconds+dead_time);
 	}
 	end_cpu_measurement();
 	end_process_measurement();
@@ -391,6 +398,7 @@ int main(int argc, char **argv)
 	char filename[4096];
 	char workload[4096] = {0,};
 	int  iterations = 1, auto_tune = 0;
+	int  calibrate = 0;
 
 	set_new_handler(out_of_memory);
 
@@ -407,14 +415,16 @@ int main(int argc, char **argv)
 		if (c == -1)
 			break;
 		switch (c) {
+		case 'd':
+			dead_time = (optarg ? atoi(optarg) : 0);
+			break;
 		case OPT_AUTO_TUNE:
 			auto_tune = 1;
 			leave_powertop = 1;
 			ui_notify_user = ui_notify_user_console;
 			break;
 		case 'c':
-			powertop_init();
-			calibrate();
+			calibrate = 1;
 			break;
 		case 'C':		/* csv report */
 			reporttype = REPORT_CSV;
@@ -460,6 +470,9 @@ int main(int argc, char **argv)
 	}
 
 	powertop_init();
+	
+	if (calibrate)
+		calibrate();
 
 	if (reporttype != REPORT_OFF)
 		make_report(time_out, workload, iterations, filename);
