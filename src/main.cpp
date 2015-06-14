@@ -410,14 +410,11 @@ int main(int argc, char **argv)
 #endif
 	ui_notify_user = ui_notify_user_ncurses;
 	while (1) { /* parse commandline options */
-		c = getopt_long(argc, argv, "cC:r:i:qt:w:Vh", long_options, &option_index);
+		c = getopt_long(argc, argv, "cC:d:r:i:qt:w:Vh", long_options, &option_index);
 		/* Detect the end of the options. */
 		if (c == -1)
 			break;
 		switch (c) {
-		case 'd':
-			dead_time = (optarg ? atoi(optarg) : 0);
-			break;
 		case OPT_AUTO_TUNE:
 			auto_tune = 1;
 			leave_powertop = 1;
@@ -429,6 +426,9 @@ int main(int argc, char **argv)
 		case 'C':		/* csv report */
 			reporttype = REPORT_CSV;
 			sprintf(filename, "%s", optarg ? optarg : "powertop.csv");
+			break;
+		case 'd':
+			dead_time = (optarg ? atoi(optarg) : 0);
 			break;
 		case OPT_DEBUG:
 			/* implemented using getopt_long(3) flag */
