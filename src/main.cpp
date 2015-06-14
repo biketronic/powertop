@@ -85,7 +85,7 @@ static const struct option long_options[] =
 	{"calibrate",	no_argument,		NULL,		 'c'},
 	{"csv",		optional_argument,	NULL,		 'C'},
 	{"debug",	no_argument,		&debug_learning, OPT_DEBUG},
-	{"deadtime"	optional_argument,	NULL,		 'd'},
+	{"deadtime",	optional_argument,	NULL,		 'd'},
 	{"extech",	optional_argument,	NULL,		 OPT_EXTECH},
 	{"html",	optional_argument,	NULL,		 'r'},
 	{"iteration",	optional_argument,	NULL,		 'i'},
